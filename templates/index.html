@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Dialect Dictionary</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        /* ========== NOTICE BOX STYLES ========== */
+        .notice-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 5px solid #f59e0b;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            position: relative;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .notice-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .notice-icon {
+            font-size: 24px;
+        }
+        
+        .notice-title {
+            font-weight: bold;
+            color: #92400e;
+            font-size: 16px;
+            flex: 1;
+        }
+        
+        .notice-toggle {
+            cursor: pointer;
+            font-size: 14px;
+            color: #92400e;
+            background: rgba(0,0,0,0.05);
+            padding: 2px 8px;
+            border-radius: 15px;
+            transition: background 0.2s;
+        }
+        
+        .notice-toggle:hover {
+            background: rgba(0,0,0,0.1);
+        }
+        
+        .notice-content {
+            color: #78350f;
+            line-height: 1.6;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .notice-content p {
+            margin-bottom: 8px;
+        }
+        
+        .notice-content ul, .notice-content ol {
+            margin-left: 20px;
+            margin-bottom: 8px;
+        }
+        
+        .notice-content li {
+            margin-bottom: 4px;
+        }
+        
+        .notice-box.info {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-left-color: #3b82f6;
+        }
+        
+        .notice-box.info .notice-title {
+            color: #1e40af;
+        }
+        
+        .notice-box.info .notice-content {
+            color: #1e3a8a;
+        }
+        
+        .notice-box.warning {
+            background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+            border-left-color: #ea580c;
+        }
+        
+        .notice-box.success {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-left-color: #10b981;
+        }
+        
+        .notice-box.success .notice-title {
+            color: #065f46;
+        }
+        
+        .edit-notice-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.1);
+            border: none;
+            padding: 4px 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .notice-box:hover .edit-notice-btn {
+            opacity: 1;
+        }
+        
+        .edit-notice-btn:hover {
+            background: rgba(0,0,0,0.2);
+        }
+        
+        .notice-edit-area {
+            display: none;
+            margin-top: 10px;
+        }
+        
+        .notice-edit-area textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .notice-edit-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        
+        .notice-edit-buttons button {
+            padding: 5px 12px;
+            font-size: 12px;
+            background: #f59e0b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        #searchInput {
+            flex: 1;
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            outline: none;
+        }
+        
+        #searchInput:focus {
+            border-color: #667eea;
+        }
+        
+        button {
+            padding: 15px 25px;
+            font-size: 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        button:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .action-buttons button {
+            background: #48bb78;
+        }
+        
+        .action-buttons button:nth-child(2) {
+            background: #ed8936;
+        }
+        
+        .action-buttons button:nth-child(3) {
+            background: #4299e1;
+        }
+        
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .word {
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .definition {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+        }
+        
+        .category {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            margin-right: 10px;
+        }
+        
+        .example {
+            color: #666;
+            font-style: italic;
+            margin-top: 10px;
+            padding-left: 20px;
+            border-left: 3px solid #667eea;
+        }
+        
+        .error {
+            color: #e74c3c;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .add-word-form {
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        
+        .add-word-form h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: inherit;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .success {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .word-list {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .word-tag {
+            background: #e2e8f0;
+            padding: 5px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .word-tag:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .notice-type-selector {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        
+        .notice-type-btn {
+            padding: 3px 10px;
+            font-size: 11px;
+            background: #e2e8f0;
+            color: #333;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .notice-type-btn.active {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        /* Search suggestions */
+        .suggestions {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .suggestions-title {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .suggestion-tag {
+            display: inline-block;
+            background: #e2e8f0;
+            padding: 4px 10px;
+            border-radius: 15px;
+            margin: 3px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        
+        .suggestion-tag:hover {
+            background: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Dialect dictionary</h1>
+        <div class="subtitle">Dialect English, absurd pronunciation and stuff.</div>
+        
+        <div id="noticeContainer"></div>
+        
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search your dictionary...">
+            <button onclick="searchWord()">🔍 Search</button>
+        </div>
+        
+        <div class="action-buttons">
+            <button onclick="showAllWords()">📖 Show All Words</button>
+            <button onclick="showRandomWord()">🎲 Random Word</button>
+            <button onclick="clearSearch()">🗑️ Clear</button>
+        </div>
+        
+        <div id="suggestions" class="suggestions"></div>
+        
+        <div id="result"></div>
+        
+        <div class="add-word-form">
+            <h3>➕ Add Your Own Word</h3>
+            <div class="form-group">
+                <input type="text" id="newWord" placeholder="Word...">
+            </div>
+            <div class="form-group">
+                <input type="text" id="newCategory" placeholder="Category...">
+            </div>
+            <div class="form-group">
+                <textarea id="newDefinition" placeholder="Definition..."></textarea>
+            </div>
+            <div class="form-group">
+                <textarea id="newExample" placeholder="Example sentence (optional)..."></textarea>
+            </div>
+            <button onclick="addWord()">💾 Save Word</button>
+            <div id="successMsg" class="success"></div>
+        </div>
+    </div>
+
+    <script>
+        // ========== YOUR CUSTOM DICTIONARY DATA ==========
+        let dictionary = {
+            "academic": {
+                category: "Chiuglish Malapropisms",
+                definition: "Misspoken by Miss Chiu, the word epidemic had been said as ”academic”. The word epidemic means happening a lot and affecting many people",
+                example: "Poverty in this country has reached academic proportions."
+            },
+            "on duty where are you": {
+                category: "Chiuglish grammar",
+                definition: "barjkworoly, on duties, are having a responsibility to help cleaning the whiteboard. Therefore, Miss Chiu frequently ask this question to summon the on duties, but ignoring the grammar mistake.",
+                example: "On duty, on duty where are you? Clean the whiteboard ”peace”."
+            },
+            "peace": {
+                category: "Chiu Malapropisms",
+                definition: "Misspoken by Miss Chiu, the word please had been said as ”peace”. The word please means to make a request more polite.",
+                example: "On duty, clean the whiteboard peace."
+            },
+            "substainable": {
+                category: "Chiuglish Malapropisms",
+                definition: "Misspelled by Miss Chiu, the word ”sustainable” is spelled as ”substainable”. The word ”sustainable” originally means able to continue over a period of time.",
+                example: "Hong Kong is experiencing a substainable development."
+            },
+            "it seems that": {
+                category: "Chiuglish / Peggilish",
+                definition: "Lee Peggy, the former geography teacher, very oftenly use the phrase 'it seems that'. However, after the first UT of QES students, she was nowhere to be seen. Today, the phrase is quoted by Miss Chiu.",
+                example: "It seems that there are no absentees today."
+            },
+            "any absentees today": {
+                category: "Chiuglish Misspellings",
+                definition: "Who the heck read the word 'dull' as 'dough'? Appre",
+                example: "The class is about to begin. Any absentees today?"
+            },
+          "dough": {
+                category: "Chiuglish mispronunces",
+                definition: "Who on Earth would produce the word 'dull' like dough? Apparantly, Miss Chiu does. Nevermind, the word 'dull' means not interesting or exciting in any way.",
+                example: "This drawing looks dough."
+            },
+          "Uh-oh": {
+                category: "Chiuglish over-enunciating",
+                definition: "Every one know what that means, right?",
+                example: "Uh-oh, good luck to you!"
+          }
+        };
+        
+        // Helper function to barjkworoize text for fuzzy matching
+        function barjkworoizeText(text) {
+            return text.toLowerCase()
+                .replace(/[\/\\\-_]/g, ' ')  // Replace slashes with spaces
+                .replace(/[^\w\s]/g, '')      // Remove punctuation
+                .replace(/\s+/g, ' ')         // barjkworoize spaces
+                .trim();
+        }
+        
+        // Improved search function with fuzzy matching
+        function searchWord() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            const resultDiv = document.getElementById('result');
+            const suggestionsDiv = document.getElementById('suggestions');
+            
+            if (!searchTerm) {
+                alert('Please enter a word or phrase');
+                return;
+            }
+            
+            const barjkworoizedSearch = barjkworoizeText(searchTerm);
+            let exactMatch = null;
+            let partialMatches = [];
+            
+            // Search through dictionary
+            for (const [key, value] of Object.entries(dictionary)) {
+                const barjkworoizedKey = barjkworoizeText(key);
+                
+                // Exact match (case insensitive)
+                if (key.toLowerCase() === searchTerm.toLowerCase() || 
+                    barjkworoizedKey === barjkworoizedSearch) {
+                    exactMatch = { word: key, data: value };
+                    break;
+                }
+                
+                // Partial match (if search term is contained in key or vice versa)
+                if (barjkworoizedKey.includes(barjkworoizedSearch) || 
+                    barjkworoizedSearch.includes(barjkworoizedKey)) {
+                    partialMatches.push({ word: key, data: value });
+                }
+            }
+            
+            // Display result
+            if (exactMatch) {
+                displayWord(exactMatch.word, exactMatch.data);
+                suggestionsDiv.style.display = 'none';
+            } else if (partialMatches.length > 0) {
+                // Show partial matches as suggestions
+                resultDiv.style.display = 'none';
+                suggestionsDiv.style.display = 'block';
+                
+                let suggestionsHtml = '<div class="suggestions-title">🔍 Did you mean one of these?</div>';
+                partialMatches.slice(0, 5).forEach(match => {
+                    suggestionsHtml += `<div class="suggestion-tag" onclick="document.getElementById('searchInput').value='${match.word.replace(/'/g, "\\'")}'; searchWord();">${match.word}</div>`;
+                });
+                suggestionsDiv.innerHTML = suggestionsHtml;
+            } else {
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `<div class="error">❌ "${searchTerm}" not found in your dictionary. Try one of these:<br><br>
+                    <strong>Similar phrases:</strong> "any absentees today", "it seems that", "on duty where are you"<br><br>
+                    <strong>Tip:</strong> Try searching for "absentees" or add this phrase using the form below!</div>`;
+                suggestionsDiv.style.display = 'none';
+            }
+        }
+        
+        function displayWord(word, data) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            
+            let html = `<div class="word">${word.charAt(0).toUpperCase() + word.slice(1)}</div>`;
+            html += `<div class="definition">`;
+            html += `<span class="category">${data.category || 'General'}</span>`;
+            html += `<div style="margin-top: 10px;">${data.definition}</div>`;
+            if (data.example) {
+                html += `<div class="example">💬 "${data.example}"</div>`;
+            }
+            html += `</div>`;
+            
+            resultDiv.innerHTML = html;
+        }
+        
+        function showAllWords() {
+            const resultDiv = document.getElementById('result');
+            const suggestionsDiv = document.getElementById('suggestions');
+            const words = Object.keys(dictionary);
+            
+            suggestionsDiv.style.display = 'none';
+            
+            if (words.length === 0) {
+                resultDiv.innerHTML = '<div class="error">No words yet. Add some!</div>';
+                resultDiv.style.display = 'block';
+                return;
+            }
+            
+            let html = '<div style="margin-bottom: 15px;"><strong>📖 All Words in Your Dictionary:</strong></div>';
+            html += '<div class="word-list">';
+            words.sort().forEach(word => {
+                const escapedWord = word.replace(/'/g, "\\'");
+                html += `<div class="word-tag" onclick="document.getElementById('searchInput').value='${escapedWord}'; searchWord();">${word}</div>`;
+            });
+            html += '</div>';
+            
+            resultDiv.innerHTML = html;
+            resultDiv.style.display = 'block';
+        }
+        
+        function showRandomWord() {
+            const words = Object.keys(dictionary);
+            if (words.length === 0) {
+                alert('No words in your dictionary yet!');
+                return;
+            }
+            const randomWord = words[Math.floor(Math.random() * words.length)];
+            document.getElementById('searchInput').value = randomWord;
+            searchWord();
+        }
+        
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('suggestions').style.display = 'none';
+        }
+        
+        function addWord() {
+            const word = document.getElementById('newWord').value.trim().toLowerCase();
+            const category = document.getElementById('newCategory').value.trim();
+            const definition = document.getElementById('newDefinition').value.trim();
+            const example = document.getElementById('newExample').value.trim();
+            
+            if (!word || !definition) {
+                alert('Please enter at least a word and definition');
+                return;
+            }
+            
+            dictionary[word] = {
+                category: category || 'Uncategorized',
+                definition: definition,
+                example: example || ''
+            };
+            
+            document.getElementById('newWord').value = '';
+            document.getElementById('newCategory').value = '';
+            document.getElementById('newDefinition').value = '';
+            document.getElementById('newExample').value = '';
+            
+            const successMsg = document.getElementById('successMsg');
+            successMsg.textContent = `✅ "${word}" added to your dictionary!`;
+            successMsg.style.display = 'block';
+            setTimeout(() => {
+                successMsg.style.display = 'none';
+            }, 3000);
+            
+            saveToLocalStorage();
+        }
+        
+        function saveToLocalStorage() {
+            localStorage.setItem('myDictionary', JSON.stringify(dictionary));
+        }
+        
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('myDictionary');
+            if (saved) {
+                dictionary = JSON.parse(saved);
+            }
+        }
+        
+        // Notice System
+        let noticeData = {
+            text: "✨ **Welcome to Dialect dictionary!** ✨\n\n• Add your own words using the form below\n• Click on any word tag to look it up\n• Your words are saved automatically!\n• For more about Chiuglish, please visit chiuglish.pythonanywhere.com\n\n📖 Try searching for: 'any absentees today', 'it seems that', or 'academic'",
+            type: "default",
+            collapsed: false,
+            title: "📢 Announcement"
+        };
+        
+        function loadNotice() {
+            const saved = localStorage.getItem('dictionaryNotice');
+            if (saved) {
+                noticeData = JSON.parse(saved);
+            }
+            renderNotice();
+        }
+        
+        function renderNotice() {
+            const container = document.getElementById('noticeContainer');
+            const noticeTypes = {
+                default: { icon: "📢", title: "Announcement", bgClass: "" },
+                info: { icon: "ℹ️", title: "Information", bgClass: "info" },
+                warning: { icon: "⚠️", title: "Warning", bgClass: "warning" },
+                success: { icon: "✅", title: "Success", bgClass: "success" }
+            };
+            
+            const typeInfo = noticeTypes[noticeData.type] || noticeTypes.default;
+            const bgClass = noticeData.type !== 'default' ? noticeData.type : '';
+            
+            let html = `
+                <div class="notice-box ${bgClass}" id="noticeBox">
+                    <div class="notice-header" onclick="toggleNoticeCollapse()">
+                        <span class="notice-icon">${typeInfo.icon}</span>
+                        <span class="notice-title">${noticeData.title || typeInfo.title}</span>
+                        <span class="notice-toggle">${noticeData.collapsed ? '▼ Show' : '▲ Hide'}</span>
+                    </div>
+                    <div class="notice-content" id="noticeContent" style="${noticeData.collapsed ? 'display: none;' : ''}">
+                        ${formatNoticeText(noticeData.text)}
+                    </div>
+                    <button class="edit-notice-btn" onclick="editNotice()">✏️ Edit</button>
+                    <div id="noticeEditArea" class="notice-edit-area"></div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+        
+        function formatNoticeText(text) {
+            let formatted = text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>')
+                .replace(/• /g, '• ');
+            return formatted;
+        }
+        
+        function toggleNoticeCollapse() {
+            noticeData.collapsed = !noticeData.collapsed;
+            saveNotice();
+            renderNotice();
+        }
+        
+        function editNotice() {
+            const editArea = document.getElementById('noticeEditArea');
+            const content = document.getElementById('noticeContent');
+            
+            if (editArea.style.display === 'block') {
+                editArea.style.display = 'none';
+                content.style.display = noticeData.collapsed ? 'none' : 'block';
+                return;
+            }
+            
+            content.style.display = 'none';
+            editArea.innerHTML = `
+                <textarea id="noticeTextEdit">${noticeData.text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
+                <div class="notice-type-selector">
+                    <button class="notice-type-btn ${noticeData.type === 'default' ? 'active' : ''}" onclick="changeNoticeType('default')">📢 Default</button>
+                    <button class="notice-type-btn ${noticeData.type === 'info' ? 'active' : ''}" onclick="changeNoticeType('info')">ℹ️ Info</button>
+                    <button class="notice-type-btn ${noticeData.type === 'warning' ? 'active' : ''}" onclick="changeNoticeType('warning')">⚠️ Warning</button>
+                    <button class="notice-type-btn ${noticeData.type === 'success' ? 'active' : ''}" onclick="changeNoticeType('success')">✅ Success</button>
+                </div>
+                <div class="form-group" style="margin-top: 10px;">
+                    <input type="text" id="noticeTitleEdit" placeholder="Custom title (optional)" value                   ="${noticeData.title || ''}">
+                </div>
+                <div class="notice-edit-buttons">
+ <button onclick="saveNoticeEdit()">💾 Save</button>
+                    <button onclick="cancelNoticeEdit()">❌ Cancel</button>
+                </div>
+            `;
+            editArea.style.display = 'block';
+        }
+        
+        function changeNoticeType(type) {
+            noticeData.type = type;
+            document.querySelectorAll('.notice-type-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+        }
+        
+        function saveNoticeEdit() {
+            const newText = document.getElementById('noticeTextEdit').value;
+            const newTitle = document.getElementById('noticeTitleEdit').value;
+            
+            if (newText.trim()) {
+                noticeData.text = newText;
+                if (newTitle.trim()) {
+                    noticeData.title = newTitle;
+                } else {
+                    const titles = { default: "Announcement", info: "Information", warning: "Warning", success: "Success" };
+                    noticeData.title = titles[noticeData.type] || "Announcement";
+                }
+                saveNotice();
+                renderNotice();
+            }
+        }
+        
+        function cancelNoticeEdit() {
+            renderNotice();
+        }
+        
+        function saveNotice() {
+            localStorage.setItem('dictionaryNotice', JSON.stringify(noticeData));
+        }
+        
+        // Initialize
+        loadFromLocalStorage();
+        loadNotice();
+        
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchWord();
+            }
+        });
+    </script>
+</body>
+</html> 
