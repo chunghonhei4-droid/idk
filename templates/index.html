@@ -618,11 +618,27 @@
                 return;
             }
             
-            dictionary[word] = {
+            var data = {
                 category: category || 'Uncategorized',
                 definition: definition,
                 example: example || ''
             };
+
+            const jsonString = JSON.stringify(data);
+
+            fetch('/addword', {
+                method: 'POST', // Or 'PUT', 'PATCH', etc.
+                headers: {
+                    'Content-Type': 'application/json' // Essential header
+                },
+                body: jsonString // Send the stringified data
+            })
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
             
             document.getElementById('newWord').value = '';
             document.getElementById('newCategory').value = '';
