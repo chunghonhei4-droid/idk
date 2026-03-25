@@ -619,6 +619,7 @@
             }
             
             var data = {
+                word: word,
                 category: category || 'Uncategorized',
                 definition: definition,
                 example: example || ''
@@ -627,14 +628,26 @@
             const jsonString = JSON.stringify(data);
 
             fetch('/addword', {
-                method: 'POST', // Or 'PUT', 'PATCH', etc.
+                method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json' // Essential header
+                    'Content-Type': 'application/json'
                 },
-                body: jsonString // Send the stringified data
+                body: jsonString
             })
-            .then(data => {
-                console.log('Success:', data);
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    // Add the word to the dictionary immediately
+                    dictionary[word] = {
+                        definition: definition,
+                        category: category || 'Uncategorized',
+                        example: example || ''
+                    };
+                    saveToLocalStorage();
+                    console.log('Success:', result.message);
+                } else {
+                    console.error('Error:', result.message);
+                }
             })
             .catch((error) => {
                 console.error('Error:', error);
